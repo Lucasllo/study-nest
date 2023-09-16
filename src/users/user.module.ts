@@ -1,13 +1,24 @@
-/* eslint-disable prettier/prettier */
-import { Module } from "@nestjs/common";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
+import { UserIdCheckMiddleware } from 'src/middlewares/user-id-check.middleware';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
 @Module({
-    imports:[],
-    controllers: [UserController],
-    providers:[UserService],
-    exports:[]
+  imports: [],
+  controllers: [UserController],
+  providers: [UserService],
+  exports: [],
 })
-export class UserModule{
+export class UserModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserIdCheckMiddleware).forRoutes({
+      path: 'users/:id',
+      method: RequestMethod.ALL,
+    });
+  }
 }

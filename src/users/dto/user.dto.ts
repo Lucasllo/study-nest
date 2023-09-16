@@ -1,21 +1,18 @@
-/* eslint-disable prettier/prettier */
-import { IsEmail, IsString, IsStrongPassword } from "class-validator";
+import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
 
 export class UserDto {
+  @IsString()
+  nome: string;
 
-    @IsString()
-    nome: string;
+  @IsEmail()
+  email: string;
 
-    @IsEmail()
-    email: string;
-
-    @IsStrongPassword({
-       minLength: 6,
-       minNumbers: 0,
-       minLowercase: 0,
-       minSymbols: 0,
-       minUppercase: 0
-    })
-    senha: string;
-
+  @IsStrongPassword({
+    minLength: 6,
+    minNumbers: 0,
+    minLowercase: 0,
+    minSymbols: 0,
+    minUppercase: 0,
+  })
+  senha: string;
 }

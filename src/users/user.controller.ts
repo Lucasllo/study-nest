@@ -1,44 +1,60 @@
-/* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../users/user';
 import { UserDto } from './dto/user.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { UserUpdatePartialDto } from './dto/user.update.partial.dto';
+import { LogInterceptor } from '../interceptors/log.interceptor';
 
+@UseInterceptors(LogInterceptor)
 @Controller('/users')
-export class UserController{
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
-    constructor(private readonly userService: UserService){}
+  @Get()
+  async getUsers(): Promise<User[]> {
+    return this.userService.getUsers();
+  }
 
-    @Get()
-     async getUsers(): Promise<User[]> {
-        return this.userService.getUsers();
-    }
+  @Post()
+  async createUser(@Body() body: UserDto): Promise<User> {
+    return this.userService.createUser(body);
+  }
 
-    @Post()
-    async createUser(@Body() body: UserDto): Promise<User>{
+  @Get(':id')
+  async getUser(@Param('id', ParseIntPipe) id: number) {
+    return { id };
+  }
 
-        return this.userService.createUser(body);
-    }
+  @Patch(':id')
+  async updatePartialUser(
+    @Body() { nome, email, senha }: UserUpdatePartialDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return { id, nome, email, senha };
+  }
 
-    @Get(':id')
-     async getUser(@Param() param){
-        return {param: param};
-    }
+  @Put(':id')
+  async updateUser(
+    @Body() body: UserUpdateDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return { id, body: body };
+  }
 
-    @Patch(':id')
-     async updatePartialUser(@Body() {nome,email,senha}: UserUpdatePartialDto, @Param() param){
-        return {param: param, nome,email,senha};
-    }
-
-    @Put(':id')
-     async updateUser(@Body() body: UserUpdateDto, @Param() param){
-        return {param: param, body: body};
-    }
-
-    @Delete(':id')
-     async deleteUser(@Body() body, @Param() param){
-        return {param: param, body: body};
-    }
+  @Delete(':id')
+  async deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return { id };
+  }
 }
