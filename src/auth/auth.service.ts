@@ -9,7 +9,9 @@ export class AuthService {
 
   async checkToken(token: string) {}
 
-  async login(email: string, senha: string) {}
+  async login(email: string, senha: string) {
+    return email;
+  }
 
   async register() {}
 
