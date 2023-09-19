@@ -16,6 +16,7 @@ import { UserDto } from './dto/user.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { UserUpdatePartialDto } from './dto/user.update.partial.dto';
 import { LogInterceptor } from '../interceptors/log.interceptor';
+import { ParamId } from 'src/decorators/param-id.decorator';
 
 @UseInterceptors(LogInterceptor)
 @Controller('/users')
@@ -33,23 +34,20 @@ export class UserController {
   }
 
   @Get(':id')
-  async getUser(@Param('id', ParseIntPipe) id: number) {
+  async getUser(@ParamId('id') id: number) {
     return { id };
   }
 
   @Patch(':id')
   async updatePartialUser(
     @Body() { nome, email, senha }: UserUpdatePartialDto,
-    @Param('id', ParseIntPipe) id: number,
+    @ParamId('id') id: number,
   ) {
     return { id, nome, email, senha };
   }
 
   @Put(':id')
-  async updateUser(
-    @Body() body: UserUpdateDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async updateUser(@Body() body: UserUpdateDto, @ParamId('id') id: number) {
     return { id, body: body };
   }
 
