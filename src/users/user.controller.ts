@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Post()
-  async createUser(@Body() body: UserDto): Promise<User> {
+  async createUser(@Body() body: UserDto): Promise<User[]> {
     return this.userService.createUser(body);
   }
 

@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../users/user';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
   private users: User[] = [];
 
-  getUsers() {
+  async getUsers() {
     return this.users;
   }
 
-  createUser(user: User) {
-    this.users.push(user);
-    return user;
+  async createUser(user) {
+    // this.users.push(user);
+    return this.users;
   }
 }
