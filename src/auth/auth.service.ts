@@ -19,12 +19,14 @@ export class AuthService {
       email: 'lucas@mail.com',
       nome: 'Lucas',
       senha: '123456',
+      role: 1,
     },
     {
       id: 2,
       email: 'lopes@mail.com',
       nome: 'Lopes',
       senha: '654321',
+      role: 2,
     },
   ];
 
@@ -79,7 +81,7 @@ export class AuthService {
   async reset(senha: string, token: string) {
     //validar token
 
-    const id: number = 1;
+    const id: number = 2;
 
     this.users.forEach((u) => (u.id == id ? (u.senha = senha) : ''));
 
@@ -93,9 +95,9 @@ export class AuthService {
   }
 
   async register(data: AuthRegisterDTO) {
-    const user: User[] = await this.userService.createUser(data);
+    const user: User = await this.userService.createUser(data);
 
-    return user.length > 0
+    return user
       ? this.createToken(user[0])
       : new UnauthorizedException('Email e/ou senha incorretos.');
   }

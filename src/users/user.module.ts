@@ -7,9 +7,10 @@ import {
 import { UserIdCheckMiddleware } from 'src/middlewares/user-id-check.middleware';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [],
