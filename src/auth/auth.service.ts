@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/user';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from '../users/user.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -18,14 +19,14 @@ export class AuthService {
       id: 1,
       email: 'lucas@mail.com',
       nome: 'Lucas',
-      senha: '123456',
+      senha: '$2b$10$5Yrdkp/2rwovehan4IWl9u3vJHjOxn4wswBUctMMrlJONr/m8UtDS',
       role: 1,
     },
     {
       id: 2,
       email: 'lopes@mail.com',
       nome: 'Lopes',
-      senha: '654321',
+      senha: '$2b$10$XdHGMkdz/VXCIDVAafCHROCfleqsLnSKOL1B8q99XEqHM/PrtPb96',
       role: 2,
     },
   ];
@@ -66,19 +67,20 @@ export class AuthService {
   }
 
   async login(email: string, senha: string) {
-    const user: User[] = this.users.filter(
-      (u) => u.email == email && u.senha == senha,
-    );
-    return user.length > 0
-      ? user[0]
-      : new UnauthorizedException('Email e/ou senha incorretos.');
+    const user: User[] = this.users.filter((u) => u.email == email);
+
+    if (user.length > 0 && (await bcrypt.compare(senha, user[0].senha))) {
+      return this.createToken(user[0]);
+    } else {
+      throw new UnauthorizedException('Email e/ou senha incorretos.');
+    }
   }
 
   async create(body: AuthRegisterDTO) {}
 
   async forget(email: string) {}
 
-  async reset(senha: string, token: string) {
+  async reset(senha: string) {
     //validar token
 
     const id: number = 2;

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../users/user';
 import { UserDto } from './dto/user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -9,14 +10,14 @@ export class UserService {
       id: 1,
       email: 'lucas@mail.com',
       nome: 'Lucas',
-      senha: '123456',
+      senha: '$2b$10$5Yrdkp/2rwovehan4IWl9u3vJHjOxn4wswBUctMMrlJONr/m8UtDS',
       role: 1,
     },
     {
       id: 2,
       email: 'lopes@mail.com',
       nome: 'Lopes',
-      senha: '654321',
+      senha: '$2b$10$XdHGMkdz/VXCIDVAafCHROCfleqsLnSKOL1B8q99XEqHM/PrtPb96',
       role: 2,
     },
   ];
@@ -26,6 +27,8 @@ export class UserService {
   }
 
   async createUser(user: UserDto) {
+    user.senha = await bcrypt.hash(user.senha, await bcrypt.genSalt());
+
     const newUser: User = {
       email: user.email,
       id: this.users.length + 1,

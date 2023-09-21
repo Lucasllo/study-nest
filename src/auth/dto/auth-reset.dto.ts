@@ -1,4 +1,4 @@
-import { IsJWT, IsString, IsStrongPassword } from 'class-validator';
+import { IsString, IsStrongPassword } from 'class-validator';
 
 export class AuthResetDTO {
   @IsString()
@@ -10,7 +10,4 @@ export class AuthResetDTO {
     minUppercase: 0,
   })
   senha: string;
-
-  @IsJWT()
-  token: string;
 }

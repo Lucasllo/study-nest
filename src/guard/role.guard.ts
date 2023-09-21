@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
 import { Role } from 'src/enum/role.enum';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
@@ -12,8 +13,19 @@ export class RoleGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
+    const isPublic = this.reflect.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+    console.log(user);
 
     if (!roles) {
       return true;

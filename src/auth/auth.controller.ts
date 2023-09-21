@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthLoginDTO } from './dto/auth-login.dto';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
@@ -6,11 +13,14 @@ import { AuthResetDTO } from './dto/auth-reset.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../guard/auth.guard';
 import { User } from 'src/decorators/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() { login, senha }: AuthLoginDTO) {
     return this.authService.login(login, senha);
@@ -27,8 +37,8 @@ export class AuthController {
   }
 
   @Post('reset')
-  async reset(@Body() { senha, token }: AuthResetDTO) {
-    return this.authService.reset(senha, token);
+  async reset(@Body() { senha }: AuthResetDTO) {
+    return this.authService.reset(senha);
   }
 
   @UseGuards(AuthGuard)

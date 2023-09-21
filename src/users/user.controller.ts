@@ -1,4 +1,3 @@
-import { AuthGuard } from './../guard/auth.guard';
 import {
   Body,
   Controller,
@@ -22,32 +21,36 @@ import { ParamId } from 'src/decorators/param-id.decorator';
 import { Role } from 'src/enum/role.enum';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleGuard } from '../guard/role.guard';
+import { Public } from 'src/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
-@UseGuards(AuthGuard, RoleGuard)
+@Roles(Role.Admin)
+@UseGuards(RoleGuard)
 @UseInterceptors(LogInterceptor)
+@ApiTags('users')
 @Controller('/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.Admin)
+  //@SkipThrottle() usado para o throttler não ser aplicado a esse endpoint
+  @Public()
   @Get()
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
-  @Roles(Role.Admin)
+  // Override default configuration for Rate limiting and duration.
+  // @Throttle({ default: { limit: 3, ttl: 60000 } }) - usando para sobrepor a configuração padrao do throttler
   @Post()
   async createUser(@Body() body: UserDto): Promise<User> {
     return this.userService.createUser(body);
   }
 
-  @Roles(Role.Admin)
   @Get(':id')
   async getUser(@ParamId('id') id: number) {
     return this.userService.getUser(id);
   }
 
-  @Roles(Role.Admin)
   @Patch(':id')
   async updatePartialUser(
     @Body() { nome, email, senha }: UserUpdatePartialDto,
@@ -56,13 +59,11 @@ export class UserController {
     return { id, nome, email, senha };
   }
 
-  @Roles(Role.Admin)
   @Put(':id')
   async updateUser(@Body() body: UserUpdateDto, @ParamId('id') id: number) {
     return { id, body: body };
   }
 
-  @Roles(Role.Admin)
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     return { id };
