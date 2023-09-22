@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,7 +23,10 @@ import { Role } from 'src/enum/role.enum';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleGuard } from '../guard/role.guard';
 import { Public } from 'src/decorators/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
 
 @Roles(Role.Admin)
 @UseGuards(RoleGuard)
@@ -41,16 +45,19 @@ export class UserController {
 
   // Override default configuration for Rate limiting and duration.
   // @Throttle({ default: { limit: 3, ttl: 60000 } }) - usando para sobrepor a configuração padrao do throttler
+  @ApiBearerAuth('access-token')
   @Post()
   async createUser(@Body() body: UserDto): Promise<User> {
     return this.userService.createUser(body);
   }
 
+  @ApiBearerAuth('access-token')
   @Get(':id')
-  async getUser(@ParamId('id') id: number) {
-    return this.userService.getUser(id);
+  async getUser(@Param('id') id: string) {
+    return this.userService.getUser(Number(id));
   }
 
+  @ApiBearerAuth('access-token')
   @Patch(':id')
   async updatePartialUser(
     @Body() { nome, email, senha }: UserUpdatePartialDto,
@@ -59,13 +66,26 @@ export class UserController {
     return { id, nome, email, senha };
   }
 
+  @ApiBearerAuth('access-token')
   @Put(':id')
   async updateUser(@Body() body: UserUpdateDto, @ParamId('id') id: number) {
     return { id, body: body };
   }
 
+  @ApiBearerAuth('access-token')
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     return { id };
+  }
+
+  @Public()
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('photo')
+  async photo(@UploadedFile() file: Express.Multer.File) {
+    const result = await writeFile(
+      join(__dirname, '..', '..', 'storage', 'photos', 'photos.jpeg'),
+      file.buffer,
+    );
+    return { result };
   }
 }

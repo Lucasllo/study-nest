@@ -4,6 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { FileModule } from './file/file.module';
 import { AuthGuard } from './guard/auth.guard';
 import { UserModule } from './users/user.module';
 
@@ -17,6 +18,7 @@ import { UserModule } from './users/user.module';
     ]),
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
+    FileModule,
   ],
   controllers: [AppController],
   providers: [
